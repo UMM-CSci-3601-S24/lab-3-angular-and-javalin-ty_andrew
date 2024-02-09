@@ -96,7 +96,7 @@ describe('TodoService', () => {
 
       it('correctly calls api/todos with filter parameter \'incomplete\'', () => {
         todoService.getTodos({ status: 'incomplete' }).subscribe(
-          todos => expect(todos).toBe(testTodos.filter(todo => todo.status === false))
+          todos => expect(todos).toEqual(testTodos.filter(todo => todo.status === false))
         );
 
         // Specify that (exactly) one request will be made to the specified URL with the status parameter.
@@ -115,7 +115,7 @@ describe('TodoService', () => {
 
       it('correctly calls api/todos with filter parameter \'complete\'', () => {
         todoService.getTodos({ status: 'complete' }).subscribe(
-          todos => expect(todos).toBe(testTodos.filter(todo => todo.status === true))
+          todos => expect(todos).toEqual(testTodos.filter(todo => todo.status === true))
         );
 
         // Specify that (exactly) one request will be made to the specified URL with the status parameter.
