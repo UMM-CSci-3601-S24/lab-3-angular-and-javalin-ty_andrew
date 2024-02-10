@@ -39,12 +39,12 @@ describe('TodoService', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    httpClient = TestBed.inject(HttpClient);
-    httpTestingController = TestBed.inject(HttpTestingController);
+      httpClient = TestBed.inject(HttpClient);
+      httpTestingController = TestBed.inject(HttpTestingController);
     // Construct an instance of the service with the mock
     // HTTP client.
-    todoService = new TodoService(httpClient);
-  });
+      todoService = new TodoService(httpClient);
+    });
 
   afterEach(() => {
     // After every test, assert that there are no more pending requests.
@@ -95,8 +95,8 @@ describe('TodoService', () => {
        */
 
       it('correctly calls api/todos with filter parameter \'incomplete\'', () => {
-        todoService.getTodos({ status: 'incomplete' }).subscribe(
-          todos => expect(todos).toEqual(testTodos.filter(todo => todo.status === false))
+        todoService.getTodos({ status: false }).subscribe(
+          todos => expect(todos).toEqual(testTodos.filter(todo => !todo.status))
         );
 
         // Specify that (exactly) one request will be made to the specified URL with the status parameter.
@@ -107,15 +107,15 @@ describe('TodoService', () => {
         // Check that the request made to that URL was a GET request.
         expect(req.request.method).toEqual('GET');
 
-        // Check that the status parameter was 'incomplete'
-        expect(req.request.params.get('status')).toEqual('incomplete');
+        // Check that the status parameter was 'false'
+        expect(req.request.params.get('status')).toEqual('false');
 
         req.flush(testTodos.filter(todo => todo.status === false));
       });
 
       it('correctly calls api/todos with filter parameter \'complete\'', () => {
-        todoService.getTodos({ status: 'complete' }).subscribe(
-          todos => expect(todos).toEqual(testTodos.filter(todo => todo.status === true))
+        todoService.getTodos({ status: true }).subscribe(
+          todos => expect(todos).toEqual(testTodos.filter(todo => !todo.status))
         );
 
         // Specify that (exactly) one request will be made to the specified URL with the status parameter.
@@ -126,8 +126,8 @@ describe('TodoService', () => {
         // Check that the request made to that URL was a GET request.
         expect(req.request.method).toEqual('GET');
 
-        // Check that the status parameter was 'complete'
-        expect(req.request.params.get('status')).toEqual('complete');
+        // Check that the status parameter was 'true'
+        expect(req.request.params.get('status')).toEqual('true');
 
         req.flush(testTodos.filter(todo => todo.status === true));
       });
@@ -152,7 +152,7 @@ describe('TodoService', () => {
       });
 
       it('correctly calls api/todos with multiple filter parameters', () => {
-        todoService.getTodos({ status: 'incomplete', body: 'Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo.'
+        todoService.getTodos({ status: false, body: 'Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo.'
         , owner: 'Fry', category: 'video games' }).subscribe(
           todos => expect(todos).toBe(testTodos)
         );
@@ -166,7 +166,7 @@ describe('TodoService', () => {
         expect(req.request.method).toEqual('GET');
 
         // Check that the status, body, owner, and category parameters are correct
-        expect(req.request.params.get('status')).toEqual('incomplete');
+        expect(req.request.params.get('status')).toEqual('false');
         expect(req.request.params.get('body')).toEqual('Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo.');
         expect(req.request.params.get('owner')).toEqual('Fry');
         expect(req.request.params.get('category')).toEqual('video games');

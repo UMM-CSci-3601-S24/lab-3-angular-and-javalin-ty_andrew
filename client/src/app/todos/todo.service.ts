@@ -30,11 +30,12 @@ export class TodoService {
    *  from the server after a possibly substantial delay (because we're
    *  contacting a remote server over the Internet).
    */
-  getTodos(filters?: { status?: string; owner?: string; body?: string; category?: string }): Observable<Todo[]> {
+  getTodos(filters?: { status?: boolean; owner?: string; body?: string; category?: string }): Observable<Todo[]> {
     let httpParams: HttpParams = new HttpParams();
     if (filters) {
       if (filters.status) {
-        httpParams = httpParams.set('status', filters.status);
+        const statusValue = filters.status? 'complete' : 'incomplete';
+        httpParams = httpParams.set('status', statusValue);
       }
       if (filters.owner) {
         httpParams = httpParams.set('owner', filters.owner);
