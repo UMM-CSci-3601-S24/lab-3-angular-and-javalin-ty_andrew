@@ -4,9 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Todo } from './todo';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class TodoService {
 
   readonly todoUrl: string = environment.apiUrl + 'todos';
