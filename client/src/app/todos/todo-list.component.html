@@ -66,7 +66,7 @@
         <div>
             <mat-nav-list class="todo-nav-list">
               <h3 mat-subheader>Todos</h3>
-                @for (user of this.filteredTodos; track todo._id) {
+                @for (todo of this.filteredTodos; track todo._id) {
                   <a mat-list-item [routerLink]="['/todos', todo._id]" class="todo-list-item">
                       <span matListItemTitle mat-line class="todo-list-name"> {{todo.owner}} </span>
                       <span matListItemLine class="todo-list-status"> {{todo.status}} </span>
