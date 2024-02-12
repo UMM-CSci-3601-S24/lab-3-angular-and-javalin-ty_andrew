@@ -96,7 +96,8 @@ describe('TodoService', () => {
 
       it('correctly calls api/todos with filter parameter \'incomplete\'', () => {
         todoService.getTodos({ status: false }).subscribe(
-          todos => expect(todos).toEqual(testTodos.filter(todo => !todo.status))
+        todos => expect(todos).toEqual(testTodos.filter(todo => !todo.status))
+          // todos => expect(todos).toBe(testTodos)
         );
 
         // Specify that (exactly) one request will be made to the specified URL with the status parameter.

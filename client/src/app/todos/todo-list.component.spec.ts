@@ -17,7 +17,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Observable } from 'rxjs';
 import { MockTodoService } from '../../testing/todo.service.mock';
 import { Todo } from './todo';
-// import { TodoCardComponent } from './todo-card.component';
+import { TodoCardComponent } from './todo-card.component';
 import { TodoListComponent } from './todo-list.component';
 import { TodoService } from './todo.service';
 
@@ -45,7 +45,7 @@ describe('TodoListComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [COMMON_IMPORTS, TodoListComponent],
+      imports: [COMMON_IMPORTS, TodoListComponent, TodoCardComponent],
       providers: [{ provide: TodoService, useValue: new MockTodoService() }]
     });
   });

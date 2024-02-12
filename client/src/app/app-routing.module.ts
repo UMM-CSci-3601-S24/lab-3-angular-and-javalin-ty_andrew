@@ -4,14 +4,14 @@ import { HomeComponent } from './home/home.component';
 import { UserListComponent } from './users/user-list.component';
 import { UserProfileComponent } from './users/user-profile.component';
 import { TodoListComponent } from './todos/todo-list.component';
-
+import { TodoProfileComponent } from './todos/todo-profile.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent, title: 'Home'},
   {path: 'users', component: UserListComponent, title: 'Users'},
   {path: 'users/:id', component: UserProfileComponent, title: 'User Profile'},
   {path: 'todos', component: TodoListComponent, title: 'Todos'},
-  {path: 'todos/:id', component: TodoListComponent, title: 'Todo Profile'}
+  {path: 'todos/:id', component: TodoProfileComponent, title: 'Todo Profile'}
 ];
 
 @NgModule({

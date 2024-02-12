@@ -41,7 +41,7 @@ export class MockTodoService extends TodoService {
   // It's OK that the `_filters` argument isn't used here, so we'll disable
   // this warning for just his function.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getTodo(_filters: { status?: boolean; category?: string; body?: string }): Observable<Todo[]> {
+  getTodos(_filters: { status?: boolean; category?: string; body?: string }): Observable<Todo[]> {
     // Our goal here isn't to test (and thus rewrite) the service, so we'll
     // keep it simple and just return the test todos regardless of what
     // filters are passed in.
@@ -51,11 +51,11 @@ export class MockTodoService extends TodoService {
     return of(MockTodoService.testTodos);
   }
 
-  getTodos(): Observable<Todo[]> {
-    return of(MockTodoService.testTodos);
-  }
+  // getTodos(): Observable<Todo[]> {
+  //   return of(MockTodoService.testTodos);
+  // }
 
-  getUserById(id: string): Observable<Todo> {
+  getTodoById(id: string): Observable<Todo> {
     // If the specified ID is for one of the test todos,
     // return that todo, otherwise return `null` so
     // we can test illegal todo requests.
