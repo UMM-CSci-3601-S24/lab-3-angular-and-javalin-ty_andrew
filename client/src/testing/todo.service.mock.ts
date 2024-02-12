@@ -51,6 +51,10 @@ export class MockTodoService extends TodoService {
     return of(MockTodoService.testTodos);
   }
 
+  getTodos(): Observable<Todo[]> {
+    return of(MockTodoService.testTodos);
+  }
+
   getUserById(id: string): Observable<Todo> {
     // If the specified ID is for one of the test todos,
     // return that todo, otherwise return `null` so

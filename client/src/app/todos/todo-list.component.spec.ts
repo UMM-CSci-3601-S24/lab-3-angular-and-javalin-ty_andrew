@@ -17,6 +17,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Observable } from 'rxjs';
 import { MockTodoService } from '../../testing/todo.service.mock';
 import { Todo } from './todo';
+// import { TodoCardComponent } from './todo-card.component';
 import { TodoListComponent } from './todo-list.component';
 import { TodoService } from './todo.service';
 
@@ -61,8 +62,16 @@ describe('TodoListComponent', () => {
     expect(todoList.serverFilteredTodos.length).toBe(3);
   });
 
-  it('contains a user named "Chris"', () => {
-    expect(todoList.serverFilteredTodos.some((todo: Todo) => todo.owner === 'Chris')).toBe(true);
+  it('contains a todo owner "Fry"', () => {
+    expect(todoList.serverFilteredTodos.some((todo: Todo) => todo.owner === 'Fry')).toBe(true);
+  });
+
+  it('contains a todo owner "Blanche"', () => {
+    expect(todoList.serverFilteredTodos.some((todo: Todo) => todo.owner === 'Blanche')).toBe(true);
+  });
+
+  it('contains a todo owner "Dawn"', () => {
+    expect(todoList.serverFilteredTodos.some((todo: Todo) => todo.owner === 'Dawn')).toBe(false);
   });
 
   it('contains a todo with category "video games" ', () => {
@@ -85,10 +94,19 @@ describe('TodoListComponent', () => {
     expect(todoList.serverFilteredTodos.some((todo: Todo) => todo.status === false )).toBe(true);
   });
 
+  it('has one todos with false status', ()  => {
+    expect(todoList.serverFilteredTodos.filter((todo: Todo) => todo.status === false).length).toBe(1);
+  })
+
+  it('has two todos with true status', ()  => {
+    expect(todoList.serverFilteredTodos.filter((todo: Todo) => todo.status === true).length).toBe(2);
+  })
+
   it('contains a todo with body "Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo." ',
   () => {
     expect(todoList.serverFilteredTodos.some((todo: Todo) => todo.body === 'Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo.')).toBe(true);
   });
+
 });
 
 describe('Misbehaving Todo List', () => {
@@ -124,7 +142,7 @@ describe('Misbehaving Todo List', () => {
     });
   }));
 
-  it('fails to load users if we do not set up a UserListService', () => {
+  it('fails to load todos if we do not set up a TodoListService', () => {
     expect(todoList.serverFilteredTodos).toBeUndefined();
   });
 });

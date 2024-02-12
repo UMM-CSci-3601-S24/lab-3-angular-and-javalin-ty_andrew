@@ -13,26 +13,26 @@ import { FormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { MatFormField, MatLabel, MatHint, MatError } from '@angular/material/form-field';
 import { MatCard, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { TodoCardComponent } from './todo-card.component';
 
 
 @Component ({
   selector: 'app-todo-list-component',
   templateUrl: 'todo-list.component.html',
-    styleUrls: ['./todo-list.component.scss'],
-    providers: [],
-    standalone: true,
-    imports: [MatCard, MatCardTitle, MatCardContent, MatFormField, MatLabel, MatInput, FormsModule, MatHint,
-      MatSelect, MatOption, MatRadioGroup, MatRadioButton, MatNavList, MatListSubheaderCssMatStyler, MatListItem,
-       RouterLink, MatListItemAvatar, MatListItemTitle, MatListItemLine, MatError],
+  styleUrls: ['./todo-list.component.scss'],
+  providers: [],
+  standalone: true,
+  imports: [MatCard, MatCardTitle, MatCardContent, MatFormField, MatLabel, MatInput, FormsModule, MatHint, MatSelect, MatOption, MatRadioGroup, MatRadioButton, MatNavList, MatListSubheaderCssMatStyler, MatListItem, RouterLink, MatListItemAvatar, MatListItemTitle, MatListItemLine, MatError, TodoCardComponent],
 })
 export class TodoListComponent implements OnInit, OnDestroy {
   public serverFilteredTodos: Todo[];
-  public filteredTodos: Todo[];
+  public todos: Todo[];
 
   public todoStatus: boolean;
   public todoOwner: string;
   public todoBody: string;
   public todoCategory: string;
+  public viewtype: 'card' | 'list' = 'card';
 
 
   errMsg = '';
@@ -57,6 +57,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
       next: (returnedTodos) => {
           this.serverFilteredTodos = returnedTodos;
           this.updateFilter();
+          this.serverFilteredTodos = this.todos;
       },
 
       error: (err) => {
@@ -70,10 +71,11 @@ export class TodoListComponent implements OnInit, OnDestroy {
   }
 
   public updateFilter() {
-    this.filteredTodos = this.todoService.filterTodos(
-      this.serverFilteredTodos, {}
-    );
+    this.todos = this.todoService.filterTodos(
+      this.serverFilteredTodos, {body: this.todoBody, owner: this.todoOwner, status: this.todoStatus}
+    )
   }
+
 
   ngOnInit(): void {
     this.getTodosFromServer();
