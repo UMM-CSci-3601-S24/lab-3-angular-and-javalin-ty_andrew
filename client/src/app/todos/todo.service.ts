@@ -80,3 +80,5 @@ export class TodoService {
     return filteredTodos;
   }
 }
+
+//ADD COMMENT TO MAKE SURE MERGING WORK.
