@@ -13,7 +13,6 @@ import { FormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { MatFormField, MatLabel, MatHint, MatError } from '@angular/material/form-field';
 import { MatCard, MatCardTitle, MatCardContent } from '@angular/material/card';
-import { TodoCardComponent } from './todo-card.component';
 
 
 @Component ({
@@ -22,7 +21,7 @@ import { TodoCardComponent } from './todo-card.component';
   styleUrls: ['./todo-list.component.scss'],
   providers: [],
   standalone: true,
-  imports: [MatCard, MatCardTitle, MatCardContent, MatFormField, MatLabel, MatInput, FormsModule, MatHint, MatSelect, MatOption, MatRadioGroup, MatRadioButton, MatNavList, MatListSubheaderCssMatStyler, MatListItem, RouterLink, MatListItemAvatar, MatListItemTitle, MatListItemLine, MatError, TodoCardComponent],
+  imports: [MatCard, MatCardTitle, MatCardContent, MatFormField, MatLabel, MatInput, FormsModule, MatHint, MatSelect, MatOption, MatRadioGroup, MatRadioButton, MatNavList, MatListSubheaderCssMatStyler, MatListItem, RouterLink, MatListItemAvatar, MatListItemTitle, MatListItemLine, MatError],
 })
 export class TodoListComponent implements OnInit, OnDestroy {
   public serverFilteredTodos: Todo[];
@@ -32,7 +31,8 @@ export class TodoListComponent implements OnInit, OnDestroy {
   public todoOwner: string;
   public todoBody: string;
   public todoCategory: string;
-  public viewtype: 'card' | 'list' = 'card';
+  public todoLimit: number;
+
 
 
   errMsg = '';
@@ -51,13 +51,14 @@ export class TodoListComponent implements OnInit, OnDestroy {
   getTodosFromServer() {
 
     this.todoService.getTodos({
+      body: this.todoBody,
+      category: this.todoCategory
     }).pipe(
       takeUntil(this.ngUnsubscribe)
     ).subscribe({
       next: (returnedTodos) => {
           this.serverFilteredTodos = returnedTodos;
           this.updateFilter();
-          this.serverFilteredTodos = this.todos;
       },
 
       error: (err) => {
@@ -72,7 +73,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
 
   public updateFilter() {
     this.todos = this.todoService.filterTodos(
-      this.serverFilteredTodos, {body: this.todoBody, owner: this.todoOwner, status: this.todoStatus}
+      this.serverFilteredTodos, {owner: this.todoOwner, status: this.todoStatus, limit: this.todoLimit}
     )
   }
 
