@@ -9,7 +9,8 @@ export class TodoService {
 
   readonly todoUrl: string = environment.apiUrl + 'todos';
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+  }
 
     /**
    * Get all the todos from the server, filtered by the information
@@ -29,23 +30,11 @@ export class TodoService {
    *  contacting a remote server over the Internet).
    */
 
-  getTodos(filters?: { status?: boolean; owner?: string; body?: string; category?: string }): Observable<Todo[]> {
+  getTodos(filters?: { body?: string; category?: string }): Observable<Todo[]> {
     let httpParams: HttpParams = new HttpParams();
     if (filters) {
-      if (filters.status) {
-        const statusValue = filters.status? 'complete' : 'incomplete';
-        httpParams = httpParams.set('status', statusValue);
-      }
-
-      // if (filters.status) {
-      //   httpParams = httpParams.set('status', filters.status.toString());
-      // }
-
-      if (filters.owner) {
-        httpParams = httpParams.set('owner', filters.owner);
-      }
       if (filters.body) {
-        httpParams = httpParams.set('body', filters.body);
+        httpParams = httpParams.set('contains', filters.body);
       }
       if (filters.category) {
         httpParams = httpParams.set('category', filters.category);
@@ -60,17 +49,6 @@ export class TodoService {
   }
 
   /**
-   * Get the `Todo` with the specified ID.
-   *
-   * @param id the ID of the desired user
-   * @returns an `Observable` containing the resulting user.
-   */
-
-  getTodoById(id: string): Observable<Todo> {
-    return this.httpClient.get<Todo>(this.todoUrl + '/' + id);
-  }
-
-  /**
    * A service method that filters an array of `Todos` using
    * the specified filters.
    *
@@ -79,33 +57,26 @@ export class TodoService {
    * partial matches instead of waiting until we have a full string
    * to match against.
    *
-   * @param todos the array of `Users` that we're filtering
+   * @param todos the array of `Todos` that we're filtering
    * @param filters the map of key-value pairs used for the filtering
    * @returns an array of `Todos` matching the given filters
    */
 
-  filterTodos(todos: Todo[], filters: { owner?: string; status?: boolean; body?: string; category?: string }): Todo[] {
+  filterTodos(todos: Todo[], filters: { owner?: string; status?: boolean; limit?: number}): Todo[] {
     let filteredTodos = todos;
 
-    if (filters.owner) {
-      filters.owner = filters.owner.toLowerCase();
-      filteredTodos = filteredTodos.filter(todo => todo.owner.toLowerCase().includes(filters.owner));
-    }
-
-    if (filters.status !== undefined) {
+    if (filters.status != null) {
       filteredTodos = filteredTodos.filter(todo => todo.status === filters.status);
     }
 
-    if (filters.body) {
-      filters.body = filters.body.toLowerCase();
-      filteredTodos = filteredTodos.filter(todo => todo.body.toLowerCase().includes(filters.body));
+    if(filters.owner) {
+      filters.owner = filters.owner.toLowerCase();
+      filteredTodos = filteredTodos.filter(todo => todo.owner.toLowerCase().indexOf(filters.owner) !== -1);
     }
 
-    if (filters.category) {
-      filters.category = filters.category.toLowerCase();
-      filteredTodos = filteredTodos.filter(todo => todo.category.toLowerCase().includes(filters.category));
+    if(filters.limit) {
+      filteredTodos = filteredTodos.slice(0,filters.limit)
     }
-
     return filteredTodos;
   }
 }

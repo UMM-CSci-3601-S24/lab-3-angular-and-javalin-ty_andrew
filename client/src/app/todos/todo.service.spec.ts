@@ -76,176 +76,52 @@ describe('TodoService', () => {
       req.flush(testTodos);
     });
 
-    describe('Calling getTodos() with parameters correctly forms the HTTP request', () => {
-      /*
-       * We really don't care what `getTodos()` returns in the cases
-       * where the filtering is happening on the server. Since all the
-       * filtering is happening on the server, `getTodos()` is really
-       * just a "pass through" that returns whatever it receives, without
-       * any "post processing" or manipulation. So the tests in this
-       * `describe` block all confirm that the HTTP request is properly formed
-       * and sent out in the world, but don't _really_ care about
-       * what `getUsers()` returns as long as it's what the HTTP
-       * request returns.
-       *
-       * So in each of these tests, we'll keep it simple and have
-       * the (mocked) HTTP request return the entire list `testTodos`
-       * even though in "real life" we would expect the server to
-       * return return a filtered subset of the users.
-       */
+    describe('getTodos()', () => {
 
-      it('correctly calls api/todos with filter parameter \'incomplete\'', () => {
-        todoService.getTodos({ status: false }).subscribe(
-        todos => expect(todos).toEqual(testTodos.filter(todo => !todo.status))
-          // todos => expect(todos).toBe(testTodos)
+      it('calls `api/todos` when `getTodos()` is called with no parameters', () => {
+        todoService.getTodos().subscribe(
+          users => expect(users).toBe(testTodos)
         );
-
-        // Specify that (exactly) one request will be made to the specified URL with the status parameter.
-        const req = httpTestingController.expectOne(
-          (request) => request.url.startsWith(todoService.todoUrl) && request.params.has('status')
-        );
-
+        const req = httpTestingController.expectOne(todoService.todoUrl);
         // Check that the request made to that URL was a GET request.
         expect(req.request.method).toEqual('GET');
-
-        // Check that the status parameter was 'false'
-        expect(req.request.params.get('status')).toEqual('false');
-
-        req.flush(testTodos.filter(todo => todo.status === false));
-      });
-
-      it('correctly calls api/todos with filter parameter \'complete\'', () => {
-        todoService.getTodos({ status: true }).subscribe(
-          todos => expect(todos).toEqual(testTodos.filter(todo => !todo.status))
-        );
-
-        // Specify that (exactly) one request will be made to the specified URL with the status parameter.
-        const req = httpTestingController.expectOne(
-          (request) => request.url.startsWith(todoService.todoUrl) && request.params.has('status')
-        );
-
-        // Check that the request made to that URL was a GET request.
-        expect(req.request.method).toEqual('GET');
-
-        // Check that the status parameter was 'true'
-        expect(req.request.params.get('status')).toEqual('true');
-
-        req.flush(testTodos.filter(todo => todo.status === true));
-      });
-
-      it('correctly calls api/todos with filter parameter \'category\'', () => {
-        todoService.getTodos({ category: 'video games' }).subscribe(
-          todos => expect(todos).toBe(testTodos)
-        );
-
-        // Specify that (exactly) one request will be made to the specified URL with the category parameter.
-        const req = httpTestingController.expectOne(
-          (request) => request.url.startsWith(todoService.todoUrl) && request.params.has('category')
-        );
-
-        // Check that the request made to that URL was a GET request.
-        expect(req.request.method).toEqual('GET');
-
-        // Check that the category parameter was 'Personal'
-        expect(req.request.params.get('category')).toEqual('video games');
-
+        // Check that the request had no query parameters.
+        expect(req.request.params.keys().length).toBe(0);
         req.flush(testTodos);
       });
 
-      it('correctly calls api/todos with multiple filter parameters', () => {
-        todoService.getTodos({ status: false, body: 'Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo.'
-        , owner: 'Fry', category: 'video games' }).subscribe(
-          todos => expect(todos).toBe(testTodos)
-        );
-        // Specify that (exactly) one request will be made to the specified URL with the status parameter.
-        const req = httpTestingController.expectOne(
-          (request) => request.url.startsWith(todoService.todoUrl)
-            && request.params.has('status') && request.params.has('body') && request.params.has('owner') && request.params.has('category')
-        );
+    })
 
-        // Check that the request made to that URL was a GET request.
-        expect(req.request.method).toEqual('GET');
+    describe('filterTodos()', () => {
 
-        // Check that the status, body, owner, and category parameters are correct
-        expect(req.request.params.get('status')).toEqual('false');
-        expect(req.request.params.get('body')).toEqual('Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo.');
-        expect(req.request.params.get('owner')).toEqual('Fry');
-        expect(req.request.params.get('category')).toEqual('video games');
-
-        req.flush(testTodos);
+      it('filters by owner', () => {
+        const todoOwner = 'Fry';
+        const filteredUsers = todoService.filterTodos(testTodos, { owner: todoOwner });
+        expect(filteredUsers.length).toBe(2);
+        filteredUsers.forEach(todo => {
+          expect(todo.owner.indexOf(todoOwner)).toBeGreaterThanOrEqual(0);
+        })
       });
-    });
-  });
 
-  describe('getTodoByID()', () => {
-    it('calls api/todos/id with the correct ID', () => {
-      // We're just picking a Todo "at random" from our
-      // set of Todos up at the top.
-      const targetTodo: Todo = testTodos[1];
-      const targetId: string = targetTodo._id;
-
-      todoService.getTodoById(targetId).subscribe(
-        // This `expect` doesn't do a _whole_ lot.
-          // Since the `targetTodo`
-          // is what the mock `HttpClient` returns in the
-          // `req.flush(targetTodo)` line below, this
-          // really just confirms that `getTodoById()`
-          // doesn't in some way modify the todo it
-          // gets back from the server.
-          todo => expect(todo).toBe(targetTodo)
-     );
-
-      const expectedUrl: string = todoService.todoUrl + '/' + targetId;
-      const req = httpTestingController.expectOne(expectedUrl);
-      expect(req.request.method).toEqual('GET');
-
-      req.flush(targetTodo);
-    });
-  });
-
-  describe('filterTodos()', () => {
-
-    /*
-      * Since `filterTodos` actually filters "locally" (in
-      * Angular instead of on the server), we do want to
-      * confirm that everything it returns has the desired
-      * properties. Since this doesn't make a call to the server,
-      * though, we don't have to use the mock HttpClient and
-      * all those complications.
-      */
-
-    it('filters by owner', () => {
-      const ownerName = 'y';
-      const filteredTodos = todoService.filterTodos(testTodos, { owner: ownerName });
-      // There should be two users with an 'y' in their
-      // name: Fry and Fry
-      expect(filteredTodos.length).toBe(2);
-      // Every returned todo's owner should contain an 'y'
-      filteredTodos.forEach(todo => {
-        expect(todo.owner.indexOf(ownerName)).toBeGreaterThanOrEqual(0);
-    });
-  });
-
-    it('filters by status', () => {
-      const todoStatus = false;
-      const filteredTodos = todoService.filterTodos(testTodos, { status: todoStatus });
-      expect(filteredTodos.length).toBe(1);
-      // Every returned todo's status should contain 'incomplete'
-      filteredTodos.forEach(todo => {
-        expect(todo.status).toBe(false);
-    });
-  });
-
-    it('filters by owner and status', () => {
-      const ownerName = 'y';
-      const todoStatus = false;
-      const filters = { owner: ownerName, status: todoStatus };
-      const filteredTodos = todoService.filterTodos(testTodos, filters);
-      expect(filteredTodos.length).toBe(1);
-      filteredTodos.forEach(todo => {
-        expect(todo.owner.indexOf(ownerName)).toBeGreaterThanOrEqual(0);
-        expect(todo.status).toBe(false);
+      it('filters by status true', () => {
+        const todoStatus = true;
+        const filteredTodos = todoService.filterTodos(testTodos, { status: todoStatus });
+        expect(filteredTodos.length).toBe(2);
+        filteredTodos.forEach(todo => {
+          expect(todo.status === todoStatus);
+        })
       });
-    });
+
+      it('filters by status false', () => {
+        const todoStatus = false;
+        const filteredTodos = todoService.filterTodos(testTodos, { status: todoStatus });
+        expect(filteredTodos.length).toBe(1);
+        filteredTodos.forEach(todo => {
+          expect(todo.status === todoStatus);
+        })
+      });
+
+
   });
 });
+})
