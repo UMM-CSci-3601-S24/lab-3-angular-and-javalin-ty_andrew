@@ -1,9 +1,8 @@
-import { TodoListPage } from '../support/todo-list.po';
+import { TodoListPage } from "cypress/support/todo-list.po";
 
 const page = new TodoListPage();
 
 describe('Todo List', () => {
-
   beforeEach(() => {
     page.navigateTo();
   });
@@ -16,109 +15,46 @@ describe('Todo List', () => {
     page.getTodoTitle().should('have.text', 'Todos');
   });
 
-  it('Should have something in the owner filter and check that it return correct elements', () => {
-    cy.get('[data-test=todoOwnerInput]').type('Fry');
-    page.getTodoCards().each($card => {
-      cy.wrap($card).find('.todo-card-name').should('have.text', 'Fry');
-    });
-
-    page.getTodoCards().find('todo-card-name').each($owner =>
-      expect($owner.text()).to.equal('Fry')
-    );
-  });
-
-  it('Should type something in the category filter and check that it return correct element', () => {
-    cy.get('[data-test=todoCategoryInput]').type('video games');
-    page.getTodoCards().should('have.lengthOf.above', 0); //what does this line do
-    page.getTodoCards().find('.user-card-company').each($card => {
-      cy.wrap($card).should('have.text', 'video games');
+  it('should filter todos by owner', () => {
+    const ownerFilter = 'Fry';
+    page.getTodoTitle().should('be.visible');
+    page.getTodoListItems().should('have.length.greaterThan', 0);
+    cy.get('[data-test=todoOwnerInput]').type(ownerFilter);
+    cy.get('.todo-list-item .todo-list-name').each(($name) => {
+      cy.wrap($name).should('include.text', ownerFilter);
     });
   });
 
+  it('should filter todos by category', () => {
+    const categoryFilter = 'Video Games';
+    page.getTodoTitle().should('be.visible');
+    page.getTodoListItems().should('have.length.greaterThan', 0);
+    cy.get('[data-test=todoCategorySelect]').click();
+    cy.get('mat-option').contains(categoryFilter).click()
+    cy.get('.todo-list-item .todo-list-category').each(($category) => {
+      cy.wrap($category).should('include.text', 'video games');
+    });
+  });
 
+  it('should filter todos by status', () => {
+    const statusFilter = 'Complete';
+    page.getTodoTitle().should('be.visible');
+    page.getTodoListItems().should('have.length.greaterThan', 0);
+    cy.get('[data-test=todoStatusSelect]').click();
+    cy.get('mat-option').contains(statusFilter).click()
+    cy.get('.todo-list-item .todo-list-status').each(($status) => {
+      cy.wrap($status).should('include.text', 'Complete');
+    });
+  });
 
+  it('should filter todos by status', () => {
+    const statusFilter = 'Incomplete';
+    page.getTodoTitle().should('be.visible');
+    page.getTodoListItems().should('have.length.greaterThan', 0);
+    cy.get('[data-test=todoStatusSelect]').click();
+    cy.get('mat-option').contains(statusFilter).click()
+    cy.get('.todo-list-item .todo-list-status').each(($status) => {
+      cy.wrap($status).should('include.text', 'Incomplete');
+    });
+  });
 })
-  it('Should type something in the name filter and check that it returned correct elements', () => {
-    // Filter for user 'Lynn Ferguson'
-    cy.get('[data-test=todoOwnerInput]').type('Blanche');
-
-    // All of the user cards should have the name we are filtering by
-    page.getTodoCards().each($card => {
-      cy.wrap($card).find('.todo-card-owner').should('have.text', 'Blanche');
-    });
-
-    // (We check this two ways to show multiple ways to check this)
-    page.getTodoCards().find('.todo-card-owner').each($owner =>
-      expect($owner.text()).to.equal('Blanche')
-    );
-  });
-
-  it('Should type something in the company filter and check that it returned correct elements', () => {
-    // Filter for company 'OHMNET'
-    cy.get('[data-test=todoBodyInput]').type('Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo.');
-
-    page.getTodoCards().should('have.lengthOf.above', 0);
-
-    // All of the user cards should have the company we are filtering by
-    page.getTodoCards().find('.todo-card-body').each($card => {
-      cy.wrap($card).should('have.text', 'Ipsum esse est ullamco magna tempor anim laborum non officia deserunt veniam commodo. Aute minim incididunt ex commodo.');
-    });
-  });
-
-  it('Should type something partial in the company filter and check that it returned correct elements', () => {
-    // Filter for companies that contain 'ti'
-    cy.get('[data-test=todoBodyInput]').type('sit');
-
-    page.getTodoCards().should('have.lengthOf', 3);
-
-    // Each user card's company name should include the text we are filtering by
-    page.getTodoCards().each(e => {
-      cy.wrap(e).find('.todo-card-body').should('include.text', 'sit');
-    });
-  });
-
-  it('Should type something in the age filter and check that it returned correct elements', () => {
-    // Filter for users of age '27'
-    cy.get('[data-test=todoStatusInput]').type('true');
-
-    page.getTodoCards().should('have.lengthOf', 4);
-  });
-
-  it('Should change the view', () => {
-    // Choose the view type "List"
-    page.changeView('list');
-
-    // We should not see any cards
-    // There should be list items
-    page.getTodoCards().should('not.exist');
-    page.getTodoListItems().should('exist');
-
-    // Choose the view type "Card"
-    page.changeView('card');
-
-    // There should be cards
-    // We should not see any list items
-    page.getTodoCards().should('exist');
-    page.getTodoListItems().should('not.exist');
-  });
-
-  it('Should click view profile on a user and go to the right URL', () => {
-    page.getTodoCards().first().then((card) => {
-      const firstTodoOwner = card.find('.todo-card-name').text();
-      const firstTodoBody = card.find('.todo-card-company').text();
-
-      // When the view profile button on the first user card is clicked, the URL should have a valid mongo ID
-      page.clickViewProfile(page.getTodoCards().first());
-
-      // The URL should contain '/users/' (note the ending slash) and '/users/' should be followed by a mongo ID
-      cy.url()
-        .should('contain', '/todos/')
-        .should('match', /.*\/todos\/[0-9a-fA-F]{24}$/);
-
-      // On this profile page we were sent to, the name and company should be correct
-      cy.get('.todo-card-owner').first().should('have.text', firstTodoOwner);
-      cy.get('.todo-card-body').first().should('have.text', firstTodoBody);
-    });
-   });
-
-});
